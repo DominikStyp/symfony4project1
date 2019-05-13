@@ -5,8 +5,11 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Repository\PostRepository;
 use App\Service\MySerializer;
+use http\Env\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\Common\Util\Debug;
 
 class PostsController extends AbstractController
 {
@@ -22,10 +25,7 @@ class PostsController extends AbstractController
         $result = $man
             ->getRepository(Post::class)
             ->findOneBy([],['id' => 'DESC']);
-        return $this->json([
-            'post' => $mySerializer->getSerializer()->serialize($result,'json')
-
-        ]);
+        return new JsonResponse($mySerializer->getSerializer()->serialize($result,'json'));
     }
 
     /**
@@ -44,7 +44,7 @@ class PostsController extends AbstractController
             'post' =>
                 $man
                     ->getRepository(Post::class)
-                    ->findOneBy(['id' => 2])
+                    ->findOneBy(['id' => 1])
         ]);
 }
 }
