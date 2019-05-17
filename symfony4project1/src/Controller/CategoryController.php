@@ -72,11 +72,11 @@ class CategoryController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $categoryParams = $request->request->get('category');
             $postsIds = $categoryParams['posts'] ?? [];
-            $category = $form->getData();
+            //$category = $form->getData();
             //dump($category);exit;
-            //$entityManager->refresh($category);
-            //$category->removeAllPosts();
-            //$category->addPostsFromArrayOfIds($postsIds, $entityManager);
+            $entityManager->refresh($category);
+            $category->removeAllPosts();
+            $category->addPostsFromArrayOfIds($postsIds, $entityManager);
             $entityManager->persist($category);
             $entityManager->flush();
             //
