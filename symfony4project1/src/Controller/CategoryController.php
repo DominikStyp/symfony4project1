@@ -53,8 +53,10 @@ class CategoryController extends AbstractController
      */
     public function show(Category $category): Response
     {
+        $posts = $category->getPosts();
         return $this->render('category/show.html.twig', [
             'category' => $category,
+            'posts' => $posts
         ]);
     }
 
@@ -67,9 +69,18 @@ class CategoryController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('category_index', [
+            $entityManager = $this->getDoctrine()->getManager();
+            $categoryParams = $request->request->get('category');
+            $postsIds = $categoryParams['posts'] ?? [];
+            $category = $form->getData();
+            //dump($category);exit;
+            //$entityManager->refresh($category);
+            //$category->removeAllPosts();
+            //$category->addPostsFromArrayOfIds($postsIds, $entityManager);
+            $entityManager->persist($category);
+            $entityManager->flush();
+            //
+            return $this->redirectToRoute('category_show', [
                 'id' => $category->getId(),
             ]);
         }
