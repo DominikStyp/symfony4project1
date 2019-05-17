@@ -43,6 +43,10 @@ class User
         $this->posts = new ArrayCollection();
     }
 
+    public function __toString() {
+        return $this->getId(). ": " . $this->getName();
+    }
+
     public function getId(): ?int
     {
         return $this->id;

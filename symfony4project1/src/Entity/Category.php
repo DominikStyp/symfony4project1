@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -31,6 +32,10 @@ class Category
     public function __construct()
     {
         $this->posts = new ArrayCollection();
+    }
+
+    public function __toString() {
+        return $this->getId(). ": " . $this->getName();
     }
 
     public function getId(): ?int
@@ -76,5 +81,25 @@ class Category
         }
 
         return $this;
+    }
+
+    public function removeAllPosts(){
+        foreach($this->posts as $post){
+            $post->removeCategory($this);
+        }
+        $this->posts = new ArrayCollection();
+        return $this;
+    }
+
+    public function addPostsFromArrayOfIds(array $ids, EntityManager $manager){
+        foreach($ids as $id){
+            /**
+             * @var $post Post
+             */
+            $post = $manager->getRepository(Post::class)->find((int)$id);
+            if(!empty($post)){
+                $this->addPost($post);
+            }
+        }
     }
 }

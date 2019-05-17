@@ -67,6 +67,10 @@ class Post
         $this->categories = new ArrayCollection();
     }
 
+    public function __toString() {
+        return $this->getId() . ": " . $this->getTitle();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
