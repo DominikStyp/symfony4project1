@@ -17,6 +17,13 @@
             </tr>
         </tbody>
     </table>
+    <p>Posts in this category: </p>
+    <table class="table">
+        <tr><th>ID</th><th>Title</th></tr>
+        {%  for post in posts %}
+            <tr><td>{{ post.id }}</td><td>{{  post.title }}</td></tr>
+        {% endfor %}
+    </table>
 
     <a href="{{ path('category_index') }}">back to list</a>
 
