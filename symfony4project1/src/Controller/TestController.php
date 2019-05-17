@@ -11,13 +11,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Common\Util\Debug;
 
-class PostsController extends AbstractController
+/**
+ * @Route("/test")
+ */
+class TestController extends AbstractController
 {
 
 
 
     /**
-     * @Route("/posts", name="posts")
+     * @Route("/posts", name="test-posts")
      */
     public function index(MySerializer $mySerializer)
     {
@@ -25,7 +28,13 @@ class PostsController extends AbstractController
         $result = $man
             ->getRepository(Post::class)
             ->findOneBy([],['id' => 'DESC']);
-        return new JsonResponse($mySerializer->getSerializer()->serialize($result,'json'));
+        return new JsonResponse(
+            $mySerializer->getSerializer()->serialize($result,'json', [
+                'enable_max_depth' => false,
+                'circular_reference_handler' => function ($object) {
+                    return $object->getId();
+                }
+            ]));
     }
 
     /**
