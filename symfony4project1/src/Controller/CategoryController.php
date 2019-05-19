@@ -72,7 +72,6 @@ class CategoryController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($category);
             $entityManager->flush();
-            $posts = $category->getPosts();
             return $this->redirectToRoute('category_show', [
                 'id' => $category->getId(),
             ]);
