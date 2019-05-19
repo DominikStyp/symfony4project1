@@ -13,7 +13,7 @@ class CategoryType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('posts')
+            ->add('posts', null, ['by_reference' =>  false])
         ;
     }
 
