@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
@@ -28,6 +29,8 @@ class Category
      * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="categories")
      */
     private $posts;
+
+    use TimestampableEntity;
 
     public function __construct()
     {
