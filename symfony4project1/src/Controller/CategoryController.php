@@ -62,45 +62,16 @@ class CategoryController extends AbstractController
 
 
     /**
-     * @Route("/{id}/edit-old", name="category_edit_old", methods={"GET","POST"})
-     */
-    public function editOld(Request $request, Category $category): Response
-    {
-        $form = $this->createForm(CategoryType::class, $category);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($category);
-            $entityManager->flush();
-            return $this->redirectToRoute('category_show', [
-                'id' => $category->getId(),
-            ]);
-        }
-
-        return $this->render('category/edit.html.twig', [
-            'category' => $category,
-            'form' => $form->createView(),
-        ]);
-    }
-
-    /**
      * @Route("/{id}/edit", name="category_edit", methods={"GET","POST"})
      */
     public function edit(Request $request, Category $category): Response
     {
         $form = $this->createForm(CategoryType::class, $category);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
-            $categoryParams = $request->request->get('category');
-            $postsIds = $categoryParams['posts'] ?? [];
-            $entityManager->refresh($category);
-            $category->removeAllPosts();
-            $category->addPostsFromArrayOfIds($postsIds, $entityManager);
             $entityManager->persist($category);
             $entityManager->flush();
-            //
             return $this->redirectToRoute('category_show', [
                 'id' => $category->getId(),
             ]);
@@ -111,6 +82,7 @@ class CategoryController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
 
     /**
      * @Route("/{id}", name="category_delete", methods={"DELETE"})
