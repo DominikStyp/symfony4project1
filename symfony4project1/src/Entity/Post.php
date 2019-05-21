@@ -63,6 +63,12 @@ class Post
      */
     private $categories;
 
+    /**
+     * @Gedmo\Slug(fields={"title", "created_at"}, separator="_", updatable=false, unique=true, dateFormat="Y-m-d")
+     * @ORM\Column(length=128, unique=true)
+     */
+    private $slug;
+
     use SoftDeleteableEntity;
 
     public function __construct()

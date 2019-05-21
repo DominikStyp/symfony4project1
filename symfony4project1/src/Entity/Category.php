@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
@@ -30,6 +31,13 @@ class Category
      * @ORM\ManyToMany(targetEntity="App\Entity\Post", mappedBy="categories")
      */
     private $posts;
+
+
+    /**
+     * @Gedmo\Slug(fields={"name", "createdAt"}, separator="_", updatable=false, unique=true, dateFormat="d/m/Y")
+     * @ORM\Column(length=128, unique=true)
+     */
+    private $slug;
 
     use TimestampableEntity;
     use SoftDeleteableEntity;
