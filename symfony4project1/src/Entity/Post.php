@@ -64,7 +64,7 @@ class Post
     private $categories;
 
     /**
-     * @Gedmo\Slug(fields={"id", "created_at", "title"}, separator="_", updatable=false, dateFormat="Y-m-d")
+     * @Gedmo\Slug(fields={"created_at", "title"}, separator="-", updatable=false, dateFormat="Y-m-d_H-i-s")
      * @ORM\Column(length=128)
      */
     private $slug;
