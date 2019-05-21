@@ -34,8 +34,8 @@ class Category
 
 
     /**
-     * @Gedmo\Slug(fields={"name", "createdAt"}, separator="_", updatable=false, unique=true, dateFormat="d/m/Y")
-     * @ORM\Column(length=128, unique=true)
+     * @Gedmo\Slug(fields={"name", "createdAt"}, separator="_", updatable=false, dateFormat="d/m/Y")
+     * @ORM\Column(length=128)
      */
     private $slug;
 

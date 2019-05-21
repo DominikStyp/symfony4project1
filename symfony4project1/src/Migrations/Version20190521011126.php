@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20190521004320 extends AbstractMigration
+final class Version20190521011126 extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -23,9 +23,7 @@ final class Version20190521004320 extends AbstractMigration
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('ALTER TABLE category ADD slug VARCHAR(128) NOT NULL');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_64C19C1989D9B62 ON category (slug)');
         $this->addSql('ALTER TABLE post ADD slug VARCHAR(128) NOT NULL');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_5A8A6C8D989D9B62 ON post (slug)');
     }
 
     public function down(Schema $schema) : void
@@ -33,9 +31,7 @@ final class Version20190521004320 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('DROP INDEX UNIQ_64C19C1989D9B62 ON category');
         $this->addSql('ALTER TABLE category DROP slug');
-        $this->addSql('DROP INDEX UNIQ_5A8A6C8D989D9B62 ON post');
         $this->addSql('ALTER TABLE post DROP slug');
     }
 }
