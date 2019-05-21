@@ -7,9 +7,16 @@ use App\Entity\Post;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class AppFixtures extends Fixture {
     private $users;
+    /** @var EntityManagerInterface  */
+    private $entityManager;
 
     const USERS = 10;
     const POSTS = 200;
@@ -17,19 +24,31 @@ class AppFixtures extends Fixture {
     const POSTS_FOR_CATEGORY_MIN = 10;
     const POSTS_FOR_CATEGORY_MAX = 30;
 
+    public function __construct(EntityManagerInterface $entityManager) {
+        $this->entityManager = $entityManager;
+    }
+
     public function load(ObjectManager $manager) {
         $faker = \Faker\Factory::create();
+        $this->resetAutoincrements();
         $this->seedUsers($manager, $faker);
         $this->seedPosts($manager, $faker);
         $this->seedCategories($manager);
     }
+
+    private function resetAutoincrements(){
+        $connection = $this->entityManager->getConnection();
+        $connection->exec("ALTER TABLE post AUTO_INCREMENT = 1;");
+        $connection->exec("ALTER TABLE category AUTO_INCREMENT = 1;");
+    }
+
 
     private function getRandomUser(ObjectManager $manager): User {
         if (empty($this->users)) {
             $this->users = $manager->getRepository(User::class)->findAll();
         }
         if (empty($this->users)) {
-            throw new \Exception("Can't find any user in database");
+            throw new \RuntimeException("Can't find any user in database");
         }
         return $this->users[array_rand($this->users)];
     }
@@ -38,7 +57,7 @@ class AppFixtures extends Fixture {
         $randomPostId = mt_rand(1, self::POSTS);
         $post = $manager->getRepository(Post::class)->findOneBy(['id' => $randomPostId]);
         if (empty($post)) {
-            throw new \Exception("Can't find post with id $randomPostId in database");
+            throw new \RuntimeException("Can't find post with id $randomPostId in database");
         }
         return $post;
     }
@@ -94,6 +113,5 @@ class AppFixtures extends Fixture {
         }
         $manager->flush();
     }
-
 
 }
