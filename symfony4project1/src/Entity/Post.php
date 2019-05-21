@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\PostRepository")
@@ -61,6 +62,8 @@ class Post
      * @ORM\ManyToMany(targetEntity="App\Entity\Category", inversedBy="posts")
      */
     private $categories;
+
+    use SoftDeleteableEntity;
 
     public function __construct()
     {
