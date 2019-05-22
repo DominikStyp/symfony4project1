@@ -1,3 +1,7 @@
 body {
     background-color: lightgray;
 }
+header.masthead{
+    background-image: url('/img/home-bg.jpg') !important;
+    cursor: auto;
+}
