@@ -18,9 +18,9 @@ class BlogController extends AbstractController
 {
 
     /**
-     * @Route("/clean-blog", name="clean-blog")
+     * @Route("/home", name="home")
      */
-    public function clean_blog()
+    public function home()
     {
         return $this->render('clean-blog/index.html.twig');
     }
