@@ -114,12 +114,13 @@ class Post
         return $this->created_at;
     }
 
-//    public function setCreatedAt(\DateTimeInterface $created_at): self
-//    {
-//        $this->created_at = $created_at;
-//
-//        return $this;
-//    }
+
+    public function setCreatedAt(\DateTimeInterface $created_at): self
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
 
     public function getUpdatedAt(): ?\DateTimeInterface
     {
@@ -194,4 +195,19 @@ class Post
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getSlug() {
+        return $this->slug;
+    }
+
+    /**
+     * @param mixed $slug
+     */
+    public function setSlug($slug): void {
+        $this->slug = $slug;
+    }
+
 }
