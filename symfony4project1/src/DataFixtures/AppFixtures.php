@@ -91,7 +91,8 @@ class AppFixtures extends Fixture {
             $post->setStatus(1);
             $post->setUser($this->getRandomUser($manager));
             $post->setTitle($faker->sentence);
-            $post->setContent($faker->text);
+            $post->setContent($faker->realText(500));
+            $post->setCreatedAt($faker->dateTimeInInterval('-2 years'));
             $manager->persist($post);
         }
         $manager->flush();
