@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+
+    <!-- Navigation -->
+    {{ include('_navigation.html.twig') }}
+
+    <!-- Page Header -->
+    {{ include('_page_header.html.twig') }}
+
+    <!-- Main Content -->
+    <div class="container">
+        {{ include('_posts_excerpts.html.twig', {'posts': posts}) }}
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    {{ include('_footer.html.twig') }}
+
+
+{% endblock %}

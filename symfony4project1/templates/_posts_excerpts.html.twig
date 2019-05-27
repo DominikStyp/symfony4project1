@@ -1,0 +1,25 @@
+<div class="row">
+    <div class="col-lg-8 col-md-10 mx-auto">
+        {% for post in posts %}
+                <div class="post-preview">
+                    <a href="/post/{{ post.id }}/{{ post.slug }}.html">
+                        <h2 class="post-title">
+                            {{ post.title }}
+                        </h2>
+                        <h3 class="post-subtitle">
+                            {{ post.content|truncate(100, true) }}
+                        </h3>
+                    </a>
+                    <p class="post-meta">Posted by
+                        <a href="/userPosts/{{ post.user.id }}">{{ post.user.name }}</a>
+                        {{ post.createdAt|date('Y-m-d H:i:s') }}</p>
+                </div>
+                <hr>
+        {% endfor %}
+
+        <!-- Pager -->
+        <div class="clearfix">
+            <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+        </div>
+    </div>
+</div>
