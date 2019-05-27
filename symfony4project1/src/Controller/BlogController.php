@@ -8,12 +8,11 @@ use App\Service\MySerializer;
 use http\Env\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Common\Util\Debug;
 
-/**
- * @Route("/test")
- */
+
 class BlogController extends AbstractController
 {
 
@@ -22,8 +21,18 @@ class BlogController extends AbstractController
      */
     public function home()
     {
-        return $this->render('clean-blog/index.html.twig');
+        $lastPosts = $this->getDoctrine()->getRepository(Post::class)
+            ->findBy([],['id' => 'desc']);
+        return $this->render('clean-blog/home.html.twig', [ 'posts' => $lastPosts]);
     }
-
+    /**
+     * @Route("/userPosts/{id}", name="userPosts")
+     */
+    public function userPosts(int $id)
+    {
+        $lastPosts = $this->getDoctrine()->getRepository(Post::class)
+            ->findBy(['user_id' => $id],['id' => 'desc']);
+        return $this->render('clean-blog/home.html.twig', [ 'posts' => $lastPosts]);
+    }
 
 }
