@@ -10,6 +10,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Prophecy\Comparator\Factory;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -33,7 +34,7 @@ class AppFixtures extends Fixture {
         $this->resetAutoincrements();
         $this->seedUsers($manager, $faker);
         $this->seedPosts($manager, $faker);
-        $this->seedCategories($manager);
+        $this->seedCategories($manager, $faker);
     }
 
     private function resetAutoincrements(){
@@ -102,10 +103,10 @@ class AppFixtures extends Fixture {
      * @param ObjectManager $manager
      * @throws \Exception
      */
-    private function seedCategories(ObjectManager $manager): void {
+    private function seedCategories(ObjectManager $manager, \Faker\Generator $faker): void {
         for ($i = 0; $i <= self::CATEGORIES; $i++) {
             $category = new Category();
-            $category->setName("Category " . $i);
+            $category->setName($faker->sentence(3) . "[" . ($i+1) . "]" );
             $categoriesPerPost = mt_rand(self::POSTS_FOR_CATEGORY_MIN, self::POSTS_FOR_CATEGORY_MAX);
             for ($x = 0; $x <= $categoriesPerPost; $x++) {
                 $category->addPost($this->getRandomPost($manager));
