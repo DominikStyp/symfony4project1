@@ -20,11 +20,14 @@ use Symfony\Component\VarDumper\VarDumper;
 class BlogController extends AbstractController
 {
 
+    const LIMIT_PER_PAGE = 5;
     /**
      * @Route("/home", name="home")
      */
     public function home()
     {
+        // here we have old method of getting repository, which is used in older versions of Symfony
+        // now we can use autowiring instead (injecting instance as an argument to the method/constructor)
         $lastPosts = $this->getDoctrine()->getRepository(Post::class)
             ->findBy([],['id' => 'desc']);
         return $this->render('clean-blog/home.html.twig', [ 'posts' => $lastPosts]);
@@ -41,10 +44,16 @@ class BlogController extends AbstractController
     /**
      * @Route("/categoryPosts/{categoryId}", name="categoryPosts")
      */
-    public function categoryPosts(int $categoryId, CategoryRepository $repository)
+    public function categoryPosts(int $categoryId, Request $request, CategoryRepository $repository)
     {
-        $lastPosts = $repository->findPosts($categoryId, 'c.id', 'DESC', 10);
-        return $this->render('clean-blog/home.html.twig', [ 'posts' => $lastPosts, 'categoryId' => $categoryId ]);
+        $pageNr = $request->query->getInt('page', 1);
+        $pagination = $repository->findPosts($categoryId, 'p.id', 'DESC', self::LIMIT_PER_PAGE, $pageNr);
+        //VarDumper::dump($pagination);
+        return $this->render('clean-blog/home.html.twig',
+            [
+                'pagination' => $pagination,
+                'categoryId' => $categoryId
+            ]);
     }
 
 }

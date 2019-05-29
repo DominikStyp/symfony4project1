@@ -10,6 +10,7 @@
                             {{ post.content|truncate(100, true) }}
                         </h3>
                     </a>
+
                     {% for category in post.categories %}
                          <i><a class="small card-link bg-light"
                                href="/categoryPosts/{{ category.id }}"
@@ -18,16 +19,12 @@
                                {% endif %}
                              >{{ category.name }}</a>, </i>
                     {% endfor %}
+
                     <p class="post-meta">Posted by
                         <a href="/userPosts/{{ post.user.id }}">{{ post.user.name }}</a>
                         {{ post.createdAt|date('Y-m-d H:i:s') }}</p>
                 </div>
                 <hr>
         {% endfor %}
-
-        <!-- Pager -->
-        <div class="clearfix">
-            <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
-        </div>
     </div>
 </div>

@@ -11,7 +11,8 @@
 
     <!-- Main Content -->
     <div class="container">
-        {{ include('_posts_excerpts.html.twig', {'posts': posts}) }}
+        {{ include('_posts_excerpts.html.twig', {'posts': pagination}) }}
+        {{ include('_posts_pagination.html.twig', { 'pagination': pagination }) }}
     </div>
 
     <hr>

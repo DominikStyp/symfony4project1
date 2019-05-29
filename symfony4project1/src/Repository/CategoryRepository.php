@@ -6,6 +6,8 @@ use App\Entity\Category;
 use App\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Collection;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -17,37 +19,47 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class CategoryRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    /** @var PaginatorInterface */
+    private $paginator;
+
+    public function __construct(RegistryInterface $registry, PaginatorInterface $paginator)
     {
         parent::__construct($registry, Category::class);
+        $this->paginator = $paginator;
     }
 
     /**
      * @param $categoryId
      * @param $orderBy
      * @param string $orderType
-     * @param int $limit
-     * @return Post[]|null
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @param int $limitPerPage
+     * @return PaginationInterface
      */
-    public function findPosts($categoryId, $orderBy, $orderType = 'DESC', $limit = 10)
+    public function findPosts($categoryId, $orderBy, $orderType = 'DESC', $limitPerPage = 10, $pageNr = 1)
     {
-         $query = $this->createQueryBuilder('c')
-            ->select(array('p', 'c'))
-            ->join('c.posts', 'p' )
+        /**
+         * WARNING!
+         * This is not standard usage of query builder, since it's defined for the Post class (not Category)
+         * so we can't use: $this->createQueryBuilder('c') - because it creates query builder ASSOCIATED with Category
+         * But creating queryBuilder via entityManager works
+         */
+         $queryBuilder = $this->getEntityManager()
+             ->createQueryBuilder()
+             ->select(array('p'))
+             ->from(Post::class, 'p')
+             ->join('p.categories', 'c' )
              ->andWhere('c.id = :cid')
              ->setParameter('cid', $categoryId)
-            ->orderBy($orderBy, $orderType)
-            ->setMaxResults($limit)
-            ->getQuery();
+             ->orderBy($orderBy, $orderType);
+         //VarDumper::dump($queryBuilder->getQuery());die;
+
+            $pagination = $this->paginator->paginate(
+                $queryBuilder, /* query NOT result */
+                $pageNr,
+                $limitPerPage
+            );
          //VarDumper::dump($query);exit;
-            /** @var Category $category */
-            $category = $query->getSingleResult();
-            if(!empty($category)) {
-                return $category->getPosts();
-            }
-            return null;
+        return $pagination;
     }
 
     // /**
