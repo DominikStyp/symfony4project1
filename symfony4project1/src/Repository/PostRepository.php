@@ -33,7 +33,7 @@ class PostRepository extends ServiceEntityRepository
      * @param int $limitPerPage
      * @return PaginationInterface
      */
-    public function findUserPosts($userId, $orderBy, $orderType = 'DESC', $limitPerPage = 10, $pageNr = 1)
+    public function findUserPosts(int $userId, $orderBy, $orderType = 'DESC', $limitPerPage = 10, $pageNr = 1)
     {
 
         $queryBuilder = $this->createQueryBuilder('p')
@@ -43,7 +43,7 @@ class PostRepository extends ServiceEntityRepository
         // proper DQL: "SELECT p FROM App\Entity\Post p WHERE p.user_id = :uid ORDER BY p.id DESC"
         // VarDumper::dump($queryBuilder->getQuery());die;
         $pagination = $this->paginator->paginate(
-            $queryBuilder, /* query NOT result */
+            $queryBuilder,
             $pageNr,
             $limitPerPage
         );
