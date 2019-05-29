@@ -4,7 +4,10 @@ namespace App\Repository;
 
 use App\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * @method Post|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,9 +17,37 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class PostRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
+    /** @var PaginatorInterface */
+    private $paginator;
+
+    public function __construct(RegistryInterface $registry, PaginatorInterface $paginator)
     {
         parent::__construct($registry, Post::class);
+        $this->paginator = $paginator;
+    }
+
+    /**
+     * @param $userId
+     * @param $orderBy
+     * @param string $orderType
+     * @param int $limitPerPage
+     * @return PaginationInterface
+     */
+    public function findUserPosts($userId, $orderBy, $orderType = 'DESC', $limitPerPage = 10, $pageNr = 1)
+    {
+
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->andWhere('p.user_id = :uid')
+            ->setParameter('uid', $userId)
+            ->orderBy($orderBy, $orderType);
+        // proper DQL: "SELECT p FROM App\Entity\Post p WHERE p.user_id = :uid ORDER BY p.id DESC"
+        // VarDumper::dump($queryBuilder->getQuery());die;
+        $pagination = $this->paginator->paginate(
+            $queryBuilder, /* query NOT result */
+            $pageNr,
+            $limitPerPage
+        );
+        return $pagination;
     }
 
     // /**

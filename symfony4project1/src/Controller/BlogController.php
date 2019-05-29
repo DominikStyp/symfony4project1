@@ -33,12 +33,16 @@ class BlogController extends AbstractController
         return $this->render('clean-blog/home.html.twig', [ 'posts' => $lastPosts]);
     }
     /**
-     * @Route("/userPosts/{id}", name="userPosts")
+     * @Route("/userPosts/{userId}", name="userPosts")
      */
-    public function userPosts(int $id, PostRepository $repository)
+    public function userPosts(int $userId, Request $request, PostRepository $repository)
     {
-        $lastPosts = $repository->findBy(['user_id' => $id],['id' => 'desc']);
-        return $this->render('clean-blog/home.html.twig', [ 'posts' => $lastPosts]);
+        $pageNr = $request->query->getInt('page', 1);
+        $pagination = $repository->findUserPosts($userId, 'p.id', 'DESC', self::LIMIT_PER_PAGE, $pageNr);
+        return $this->render('clean-blog/home.html.twig',
+            [
+                'pagination' => $pagination
+            ]);
     }
 
     /**
