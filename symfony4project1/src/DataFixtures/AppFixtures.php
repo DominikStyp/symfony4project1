@@ -39,6 +39,7 @@ class AppFixtures extends Fixture {
 
     private function resetAutoincrements(){
         $connection = $this->entityManager->getConnection();
+        $connection->exec("ALTER TABLE user AUTO_INCREMENT = 1;");
         $connection->exec("ALTER TABLE post AUTO_INCREMENT = 1;");
         $connection->exec("ALTER TABLE category AUTO_INCREMENT = 1;");
     }
@@ -75,6 +76,7 @@ class AppFixtures extends Fixture {
             $user->setName($faker->name);
             $user->setAddress($faker->address);
             $user->setEmail($faker->email);
+            $user->setPassword($faker->password);
             $manager->persist($user);
         }
         $manager->flush();
