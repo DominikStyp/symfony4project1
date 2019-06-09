@@ -37,15 +37,66 @@ class UserToPostRelationTest extends KernelTestCase
      *  !!! if we change User (inverse side) from Post perspective chagnes WON'T BE CONSIDERED!
      *  !!! if we change Post (owning side) from User perspective changes WILL BE CONSIDERED!
      */
-    public function testChangeInverseAndOwningSideOfUserToPostRelation()
+    public function testInverseSideOfUserToPostRelation()
     {
         /** @var User $user */
-        $user = $this->entityManager->getRepository(User::class)->find(1);
-        /** @var Post $post */
-        $post = $user->getPosts()->current();
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertInstanceOf(Post::class, $post);
+        $userId = 1;
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+        /** @var Post $postNr2ForSwap */
+        // find post of other user to swap with user 1
+        $postNr2ForSwap = $this->entityManager->getRepository(Post::class)
+            ->findOneBy(['user_id' => 2], ['id' => 'ASC']);
+        ///........ trying to swap 2 posts, and persist changes
+        $user->getPosts()[0] = $postNr2ForSwap;
+        $this->entityManager->flush();
+
+        // checking if post was swapped so it has the same title
+        // in user object is seems that titles match
+        $this->assertEquals(
+            $user->getPosts()[0]->getTitle(),
+            $postNr2ForSwap->getTitle()
+        );
+        // WARNING HERE!!! We must clear() the Entity Manager, otherwise it does not get us FRESH record from the database,
+        // and it will retain wrong (not persisted) record in memory
+        $this->entityManager->clear();
+        /** @var Post $newPost */
+        $newPost = $this->entityManager->getRepository(User::class)
+            ->find($userId)
+            ->getPosts()[0];
+        // If we check the same post fresh from the database ($newPost)
+        // it seems that it hasn't changed at all
+        $this->assertNotEquals(
+            $newPost->getTitle(),
+            $postNr2ForSwap->getTitle()
+        );
+
     }
+
+
+    public function testOwningSideOfUserToPostRelation()
+    {
+        /** @var Post $postNr1 */
+        $postNr1 = $this->entityManager->getRepository(Post::class)->findOneBy(['user_id' => 1], ['id' => 'ASC']);
+        $postNr2 = $this->entityManager->getRepository(Post::class)->findOneBy(['user_id' => 2], ['id' => 'ASC']);
+        $postId1 = $postNr1->getId();
+        $postId2 = $postNr2->getId();
+        echo PHP_EOL."Changing post with id: $postId1 to user_id=2".PHP_EOL;
+        // check if users from post1 and post2 ARE NOT THE SAME
+        $this->assertNotEquals($postNr1->getUser()->getId(), $postNr2->getUser()->getId());
+        $user2 = $postNr2->getUser();
+        // swapping users
+        $postNr1->setUser($user2);
+        // and now changes are persisted to database and user is changed for post nr 1
+        $this->entityManager->flush();
+        $this->entityManager->clear();
+        $postNr1 = $this->entityManager->getRepository(Post::class)->find($postId1);
+        $postNr2 = $this->entityManager->getRepository(Post::class)->find($postId2);
+        // THIS TIME THOSE 2 POSTS SHOULD HAVE THE SAME USER!
+        $this->assertEquals($postNr1->getUser()->getId(), $postNr2->getUser()->getId());
+
+    }
+
+
 
     /**
      * {@inheritDoc}
