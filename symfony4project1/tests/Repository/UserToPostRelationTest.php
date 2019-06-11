@@ -10,26 +10,10 @@ namespace App\Tests\Repository;
 
 use App\Entity\User;
 use App\Entity\Post;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use App\Tests\CommonTestCase;
 
-class UserToPostRelationTest extends KernelTestCase
+class UserToPostRelationTest extends CommonTestCase
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
-    {
-        $kernel = self::bootKernel();
-
-        $this->entityManager = $kernel->getContainer()
-            ->get('doctrine')
-            ->getManager();
-    }
 
     /**
      * User (inverse side) $posts -> OneToMany(targetEntity="App\Entity\Post", mappedBy="user", orphanRemoval=true)
@@ -96,15 +80,4 @@ class UserToPostRelationTest extends KernelTestCase
 
     }
 
-
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function tearDown()
-    {
-        parent::tearDown();
-        $this->entityManager->close();
-        $this->entityManager = null; // avoid memory leaks
-    }
 }
