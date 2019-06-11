@@ -52,6 +52,11 @@ class User implements UserInterface
      */
     private $posts;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\UserAdditionalAttributes", mappedBy="user", cascade={"persist", "remove"})
+     */
+    private $userAdditionalAttributes;
+
     use TimestampableEntity;
     use SoftDeleteableEntity;
 
@@ -195,6 +200,23 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getUserAdditionalAttributes(): ?UserAdditionalAttributes
+    {
+        return $this->userAdditionalAttributes;
+    }
+
+    public function setUserAdditionalAttributes(UserAdditionalAttributes $userAdditionalAttributes): self
+    {
+        $this->userAdditionalAttributes = $userAdditionalAttributes;
+
+        // set the owning side of the relation if necessary
+        if ($this !== $userAdditionalAttributes->getUser()) {
+            $userAdditionalAttributes->setUser($this);
+        }
+
+        return $this;
     }
 
 

@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Category;
 use App\Entity\Post;
 use App\Entity\User;
+use App\Entity\UserAdditionalAttributes;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Connection;
@@ -19,7 +20,7 @@ class AppFixtures extends Fixture {
     /** @var EntityManagerInterface  */
     private $entityManager;
 
-    const USERS = 10;
+    const USERS = 20;
     const POSTS = 200;
     const CATEGORIES = 20;
     const POSTS_FOR_CATEGORY_MIN = 10;
@@ -29,17 +30,26 @@ class AppFixtures extends Fixture {
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @param ObjectManager $manager
+     * @throws \Exception
+     */
     public function load(ObjectManager $manager) {
         $faker = \Faker\Factory::create();
         $this->resetAutoincrements();
         $this->seedUsers($manager, $faker);
         $this->seedPosts($manager, $faker);
         $this->seedCategories($manager, $faker);
+        $this->seedUserAttributes($manager, $faker);
     }
 
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     */
     private function resetAutoincrements(){
         $connection = $this->entityManager->getConnection();
         $connection->exec("ALTER TABLE user AUTO_INCREMENT = 1;");
+        $connection->exec("ALTER TABLE user_additional_attributes AUTO_INCREMENT = 1;");
         $connection->exec("ALTER TABLE post AUTO_INCREMENT = 1;");
         $connection->exec("ALTER TABLE category AUTO_INCREMENT = 1;");
     }
@@ -116,6 +126,48 @@ class AppFixtures extends Fixture {
             $manager->persist($category);
         }
         $manager->flush();
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @throws \Exception
+     */
+    private function seedUserAttributes(ObjectManager $manager, \Faker\Generator $faker): void {
+        $allUsers = $manager->getRepository(User::class)->findAll();
+        /** @var User $user */
+        foreach($allUsers as $user)  {
+             $userAttributes = new UserAdditionalAttributes();
+             $userAttributes->setAttributesJson($this->getRandomUserAttributesArray($faker));
+             $userAttributes->setUser($user);
+             $manager->persist($userAttributes);
+        }
+        $manager->flush();
+    }
+
+    private function getRandomUserAttributesArray(\Faker\Generator $faker) : array {
+        $rand = mt_rand(0,3);
+        switch ($rand){
+            case 0 : return [
+                'home_phone' => $faker->phoneNumber,
+                'office_phone' => $faker->phoneNumber
+            ];
+            case 1 : return [ 'wife_name' => $faker->firstNameFemale,
+                'age' => $faker->numberBetween(20,50)
+            ];
+            case 2 : return [
+                'interests' => $faker->randomElements(
+                                    ['baseball', 'football', 'tv', 'computers', 'health', 'science'],
+                                    mt_rand(1,6)
+                               ),
+                'age' => $faker->numberBetween(20,50)
+            ];
+            case 3 : return [
+                'home_phone' => $faker->phoneNumber,
+                'religion' => $faker->randomElement(['catholic','protestant','mormon'])
+            ];
+            default: return [];
+        }
+
     }
 
 }
