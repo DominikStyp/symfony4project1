@@ -20,11 +20,12 @@ class AppFixtures extends Fixture {
     /** @var EntityManagerInterface  */
     private $entityManager;
 
-    const USERS = 20;
-    const POSTS = 200;
+    const USERS = 50;
+    const POSTS = 300;
     const CATEGORIES = 20;
     const POSTS_FOR_CATEGORY_MIN = 10;
     const POSTS_FOR_CATEGORY_MAX = 30;
+    const USER_INTERESTS_ARRAY = ['baseball', 'football', 'tv', 'computers', 'health', 'science'];
 
     public function __construct(EntityManagerInterface $entityManager) {
         $this->entityManager = $entityManager;
@@ -148,20 +149,25 @@ class AppFixtures extends Fixture {
         $rand = mt_rand(0,3);
         switch ($rand){
             case 0 : return [
+                'common_attr' => '123',
                 'home_phone' => $faker->phoneNumber,
                 'office_phone' => $faker->phoneNumber
             ];
-            case 1 : return [ 'wife_name' => $faker->firstNameFemale,
+            case 1 : return [
+                'common_attr' => '123',
+                'wife_name' => $faker->firstNameFemale,
                 'age' => $faker->numberBetween(20,50)
             ];
             case 2 : return [
+                'common_attr' => '123',
                 'interests' => $faker->randomElements(
-                                    ['baseball', 'football', 'tv', 'computers', 'health', 'science'],
+                                    self::USER_INTERESTS_ARRAY,
                                     mt_rand(1,6)
                                ),
                 'age' => $faker->numberBetween(20,50)
             ];
             case 3 : return [
+                'common_attr' => '123',
                 'home_phone' => $faker->phoneNumber,
                 'religion' => $faker->randomElement(['catholic','protestant','mormon'])
             ];
