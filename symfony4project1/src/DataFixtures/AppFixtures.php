@@ -21,7 +21,7 @@ class AppFixtures extends Fixture {
     private $entityManager;
 
     const USERS = 50;
-    const POSTS = 300;
+    const POSTS = 500;
     const CATEGORIES = 20;
     const POSTS_FOR_CATEGORY_MIN = 10;
     const POSTS_FOR_CATEGORY_MAX = 30;
