@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\UserAdditionalAttributes;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
@@ -17,6 +18,27 @@ class UserAdditionalAttributesRepository extends ServiceEntityRepository
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, UserAdditionalAttributes::class);
+    }
+
+
+    /**
+     * @param string $interests
+     * @return User
+     */
+    public function getRandomUserWithInterest($interests = 'tv'): User{
+        $queryBuilder = $this->createQueryBuilder('a');
+        $query = $queryBuilder
+            ->where("JSON_CONTAINS(a.attributes_json, :interestAttr, '$.interests') = 1")
+            ->add("orderBy", "RAND()")
+            ->orderBy('RAND()')
+            ->setMaxResults(1)
+            ->getQuery();
+
+        $result = $query->execute(array(
+            'interestAttr' => '"'.$interests.'"',
+        ));
+        $user = $result[0]->getUser();
+        return $user;
     }
 
     // /**
