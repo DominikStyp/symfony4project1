@@ -18,7 +18,7 @@
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
-            <exclude>./tests/Repository/UserToPostRelationTest.php</exclude>
+            <exclude>./tests/Repository/</exclude>
         </testsuite>
     </testsuites>
 
