@@ -12,7 +12,7 @@ namespace App\EventListeners;
 use App\Entity\User;
 use \Doctrine\Common\Persistence\Event\LifecycleEventArgs;
 
-class MyTestEventListener
+class EventListenerWhichChangesEmailOnUpdate
 {
     const TEST_EMAIL = "changed@gmail.com";
 
