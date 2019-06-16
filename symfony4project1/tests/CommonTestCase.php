@@ -20,6 +20,7 @@ class CommonTestCase extends KernelTestCase {
      */
     protected $entityManager;
 
+    protected static $reloadFixturesBeforeTests = true;
 
     /**
      * @param Application $application
@@ -82,8 +83,10 @@ class CommonTestCase extends KernelTestCase {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
         $kernel = self::bootKernel();
-        $application = new Application($kernel);
-        self::loadDatabaseFixtures($application);
+        if(static::$reloadFixturesBeforeTests) {
+            $application = new Application($kernel);
+            self::loadDatabaseFixtures($application);
+        }
     }
 
     /**
