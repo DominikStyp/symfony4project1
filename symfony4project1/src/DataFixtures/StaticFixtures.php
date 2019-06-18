@@ -1,6 +1,8 @@
 <?php
 
+
 namespace App\DataFixtures;
+
 
 use App\Entity\Category;
 use App\Entity\Post;
@@ -8,23 +10,20 @@ use App\Entity\User;
 use App\Entity\UserAdditionalAttributes;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Prophecy\Comparator\Factory;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Exception;
+use Faker\Factory;
+use Faker\Generator;
 
-class AppFixtures extends Fixture {
+class StaticFixtures extends Fixture {
     private $users;
     /** @var EntityManagerInterface  */
     private $entityManager;
 
-    const USERS = 50;
-    const POSTS = 500;
-    const CATEGORIES = 20;
-    const POSTS_FOR_CATEGORY_MIN = 10;
-    const POSTS_FOR_CATEGORY_MAX = 30;
+    const USERS = 20;
+    const POSTS = 100;
+    const CATEGORIES = 10;
+    const POSTS_FOR_CATEGORY = 10;
     const USER_INTERESTS_ARRAY = ['baseball', 'football', 'tv', 'computers', 'health', 'science'];
 
     public function __construct(EntityManagerInterface $entityManager) {
@@ -36,7 +35,7 @@ class AppFixtures extends Fixture {
      * @throws \Exception
      */
     public function load(ObjectManager $manager) {
-        $faker = \Faker\Factory::create();
+        $faker = Factory::create();
         $this->resetAutoincrements();
         $this->seedUsers($manager, $faker);
         $this->seedPosts($manager, $faker);
@@ -56,38 +55,19 @@ class AppFixtures extends Fixture {
     }
 
 
-    private function getRandomUser(ObjectManager $manager): User {
-        if (empty($this->users)) {
-            $this->users = $manager->getRepository(User::class)->findAll();
-        }
-        if (empty($this->users)) {
-            throw new \RuntimeException("Can't find any user in database");
-        }
-        return $this->users[array_rand($this->users)];
-    }
-
-    private function getRandomPost(ObjectManager $manager): Post {
-        $randomPostId = mt_rand(1, self::POSTS);
-        $post = $manager->getRepository(Post::class)->findOneBy(['id' => $randomPostId]);
-        if (empty($post)) {
-            throw new \RuntimeException("Can't find post with id $randomPostId in database");
-        }
-        return $post;
-    }
-
 
     /**
      * @param ObjectManager $manager
-     * @param \Faker\Generator $faker
+     * @param Generator $faker
      * @return void
      */
-    private function seedUsers(ObjectManager $manager, \Faker\Generator $faker): void {
-        for ($i = 0; $i <= self::USERS; $i++) {
+    private function seedUsers(ObjectManager $manager, Generator $faker): void {
+        for ($i = 1; $i <= self::USERS; $i++) {
             $user = new User();
-            $user->setName($faker->name);
-            $user->setAddress($faker->address);
-            $user->setEmail($faker->email);
-            $user->setPassword($faker->password);
+            $user->setName("John Doe $i");
+            $user->setAddress("Poland, Krakow ul. Balicka $i");
+            $user->setEmail("john.doe{$i}@gmail.com");
+            $user->setPassword("123321");
             $manager->persist($user);
         }
         $manager->flush();
@@ -95,17 +75,22 @@ class AppFixtures extends Fixture {
 
     /**
      * @param ObjectManager $manager
-     * @param \Faker\Generator $faker
+     * @param Generator $faker
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    private function seedPosts(ObjectManager $manager, \Faker\Generator $faker): void {
-        for ($i = 0; $i <= self::POSTS; $i++) {
+    private function seedPosts(ObjectManager $manager, Generator $faker): void {
+        for ($i = 1; $i <= self::POSTS; $i++) {
+            $userId = ceil($i/10);
+            $userObj = $manager->find(User::class, $userId);
+            if(!$userObj instanceof User){
+                throw new \Exception(("userObj is not instance of Entity User, for user_id: $userId. Try to increase the number of users added to database to avoid this error."));
+            }
             $post = new Post();
             $post->setStatus(1);
-            $post->setUser($this->getRandomUser($manager));
-            $post->setTitle($faker->sentence);
-            $post->setContent($faker->realText(500));
+            $post->setUser($userObj);
+            $post->setTitle("Post nr $i");
+            $post->setContent("This is some post. This post should be static. Only thing that differs me from another post is my unique number. My UNIQUE_ID:{$i}");
             $post->setCreatedAt($faker->dateTimeInInterval('-2 years'));
             $manager->persist($post);
         }
@@ -116,16 +101,24 @@ class AppFixtures extends Fixture {
      * @param ObjectManager $manager
      * @throws \Exception
      */
-    private function seedCategories(ObjectManager $manager, \Faker\Generator $faker): void {
-        for ($i = 0; $i <= self::CATEGORIES; $i++) {
+    private function seedCategories(ObjectManager $manager, Generator $faker): void {
+        $postCounter = 1;
+        for ($i = 1; $i <= self::CATEGORIES; $i++) {
             $category = new Category();
-            $category->setName($faker->sentence(3) . "[" . ($i+1) . "]" );
-            $categoriesPerPost = mt_rand(self::POSTS_FOR_CATEGORY_MIN, self::POSTS_FOR_CATEGORY_MAX);
-            for ($x = 0; $x <= $categoriesPerPost; $x++) {
-                $category->addPost($this->getRandomPost($manager));
+            $category->setName("Category nr:$i" );
+            for ($x = 1; $x <= self::POSTS_FOR_CATEGORY; $x++) {
+                $postId = $postCounter;
+                $postObj = $manager->find(Post::class, $postId);
+                //echo PHP_EOL."post_id:{$postId}, category_id:{$i}";
+                if(!$postObj instanceof Post){
+                    throw new \Exception(("userObj is not instance of Entity Post, for post_id: $postId. Try to increase the number of posts added to database to avoid this error."));
+                }
+                $category->addPost($postObj);
+                $postCounter++;
             }
             $manager->persist($category);
         }
+       // echo PHP_EOL;
         $manager->flush();
     }
 
@@ -133,19 +126,19 @@ class AppFixtures extends Fixture {
      * @param ObjectManager $manager
      * @throws \Exception
      */
-    private function seedUserAttributes(ObjectManager $manager, \Faker\Generator $faker): void {
+    private function seedUserAttributes(ObjectManager $manager, Generator $faker): void {
         $allUsers = $manager->getRepository(User::class)->findAll();
         /** @var User $user */
         foreach($allUsers as $user)  {
-             $userAttributes = new UserAdditionalAttributes();
-             $userAttributes->setAttributesJson($this->getRandomUserAttributesArray($faker));
-             $userAttributes->setUser($user);
-             $manager->persist($userAttributes);
+            $userAttributes = new UserAdditionalAttributes();
+            $userAttributes->setAttributesJson($this->getRandomUserAttributesArray($faker));
+            $userAttributes->setUser($user);
+            $manager->persist($userAttributes);
         }
         $manager->flush();
     }
 
-    private function getRandomUserAttributesArray(\Faker\Generator $faker) : array {
+    private function getRandomUserAttributesArray(Generator $faker) : array {
         $rand = mt_rand(0,3);
         switch ($rand){
             case 0 : return [
@@ -161,9 +154,9 @@ class AppFixtures extends Fixture {
             case 2 : return [
                 'common_attr' => '123',
                 'interests' => $faker->randomElements(
-                                    self::USER_INTERESTS_ARRAY,
-                                    mt_rand(1,6)
-                               ),
+                    self::USER_INTERESTS_ARRAY,
+                    mt_rand(1,6)
+                ),
                 'age' => $faker->numberBetween(20,50)
             ];
             case 3 : return [
@@ -175,5 +168,6 @@ class AppFixtures extends Fixture {
         }
 
     }
+
 
 }

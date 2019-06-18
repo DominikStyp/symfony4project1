@@ -21,6 +21,7 @@ class CommonTestCase extends KernelTestCase {
     protected $entityManager;
 
     protected static $reloadFixturesBeforeTests = true;
+    protected static $fixturesClassUsed = 'StaticFixtures';
 
     /**
      * @param Application $application
@@ -69,6 +70,7 @@ class CommonTestCase extends KernelTestCase {
         $command = $application->find('doctrine:fixtures:load');
         $arguments = [
             'command' => 'doctrine:fixtures:load',
+            '--group' => [self::$fixturesClassUsed]
         ];
         $input = new ArrayInput($arguments);
         $input->setInteractive(false);
