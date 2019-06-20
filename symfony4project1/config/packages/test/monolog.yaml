@@ -2,6 +2,15 @@ monolog:
     handlers:
         main:
             type: stream
-            path: "%kernel.logs_dir%/%kernel.environment%.log"
+            path: "%kernel.logs_dir%/teeeest.log"
             level: debug
-            channels: ["!event"]
+        console_exceptions_handler:
+            type: stream
+            path: "%kernel.logs_dir%/test_CONSOLE_EXCEPTIONS.log"
+            level: debug
+            channels: ['console_exceptions_listener']
+        runtime_exceptions_handler:
+            type: stream
+            path: "%kernel.logs_dir%/test_RUNTIME_EXCEPTIONS.log"
+            level: debug
+            channels: ['runtime_exceptions_listener']

@@ -37,4 +37,5 @@ doctrine:
             numeric_functions:
                 rand: App\DoctrineAdditionalFunctions\Rand
         result_cache_driver:
-            type: array
+            type: php_file
+            #directory: '%kernel.project_dir%/cache'

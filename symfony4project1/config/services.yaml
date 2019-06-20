@@ -38,3 +38,27 @@ services:
         class: Twig_Extensions_Extension_Date
         tags:
             - { name: twig.extension }
+
+    app.console_exceptions_logger:
+        class: App\EventListeners\ConsoleExceptionListener
+        arguments: ['@logger']
+        tags:
+            # tu ustawiamy typy eventow jakie ma zbierac listener
+            # https://symfony.com/doc/current/reference/dic_tags.html#monolog-logger
+            # https://symfony.com/doc/current/reference/events.html
+            - { name: kernel.event_listener, event: console.error }
+            # tak ustawiamy specyficzny kanal na jaki zostanie ustawiony injectowany do ExceptionListenera logger
+            # https://symfony.com/doc/current/reference/dic_tags.html#monolog-logger
+            - { name: monolog.logger, channel: console_exceptions_listener }
+
+    app.runtime_exceptions_logger:
+        class: App\EventListeners\RuntimeExceptionsLogger
+        arguments: ['@logger']
+        tags:
+            # tu ustawiamy typy eventow jakie ma zbierac listener
+            # https://symfony.com/doc/current/reference/dic_tags.html
+            # https://symfony.com/doc/current/reference/events.html
+            - { name: kernel.event_listener, event: kernel.exception }
+            # tak ustawiamy specyficzny kanal na jaki zostanie ustawiony injectowany do ExceptionListenera logger
+            # https://symfony.com/doc/current/reference/dic_tags.html#monolog-logger
+            - { name: monolog.logger, channel: runtime_exceptions_listener }
