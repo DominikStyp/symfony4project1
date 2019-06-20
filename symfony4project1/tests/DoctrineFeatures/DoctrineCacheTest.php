@@ -47,37 +47,11 @@ class DoctrineCacheTest extends CommonTestCase
 
 
     /**
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\TransactionRequiredException
-     */
-    public function testDoctrineCacheResult()
-    {
-        // first part cached query
-        $email =  $this->retrieveCachedUser(1, 15)->getEmail();
-        // lets validate if this is an email
-        $this->assertTrue(strpos($email,'@') !==false );
-
-        // second part remove the user (non cached)
-        $user = $this->entityManager->find(User::class, 1);
-        $this->entityManager->remove($user);
-        $this->entityManager->flush();
-
-        // third part retrieve user again using same method which is still cached, but does not exist in database anymore
-        $email2 =  $this->retrieveCachedUser(1, 15)->getEmail();
-        $this->assertEquals($email, $email2);
-
-        // part four check if user really does not exist in DB anymore, it should not...
-        $user = $this->entityManager->find(User::class, 1);
-        $this->assertEmpty($user);
-    }
-
-    /**
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\TransactionRequiredException
      * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      */
     public function testDoctrineCacheResultWithWaitForExpiration()
     {

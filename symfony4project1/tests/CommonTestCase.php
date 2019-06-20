@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class CommonTestCase extends KernelTestCase {
     /**
@@ -84,9 +85,9 @@ class CommonTestCase extends KernelTestCase {
      */
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
-        $kernel = self::bootKernel();
+        self::bootKernel();
         if(static::$reloadFixturesBeforeTests) {
-            $application = new Application($kernel);
+            $application = new Application(self::$kernel);
             self::loadDatabaseFixtures($application);
         }
     }
@@ -97,8 +98,8 @@ class CommonTestCase extends KernelTestCase {
      */
     protected function setUp()
     {
-        $kernel = self::bootKernel();
-        $this->entityManager = $kernel->getContainer()
+        //$kernel = self::bootKernel();
+        $this->entityManager = self::$kernel->getContainer()
             ->get('doctrine')
             ->getManager();
     }
