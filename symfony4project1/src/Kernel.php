@@ -9,6 +9,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
@@ -28,6 +31,33 @@ class Kernel extends BaseKernel
     public function getProjectDir(): string
     {
         return \dirname(__DIR__);
+    }
+
+
+
+    /**
+     * @throws \Throwable
+     */
+    protected function initializeContainer() {
+
+        try {
+            $container = parent::initializeContainer();
+        } catch (\Throwable $throwable){
+            $this->logCriticalErrors($throwable);
+            var_dump($throwable->getTrace());
+            throw $throwable;
+        }
+        return $container;
+    }
+
+    /**
+     * @param \Throwable $throwable
+     * @throws \Exception
+     */
+    private function logCriticalErrors(\Throwable $throwable){
+        $log = new Logger('name');
+        $log->pushHandler(new StreamHandler($this->getProjectDir().'/var/log/CRITICAL_ERRORS.log', Logger::ERROR));
+        $log->error($throwable->getMessage(), $throwable->getTrace());
     }
 
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
