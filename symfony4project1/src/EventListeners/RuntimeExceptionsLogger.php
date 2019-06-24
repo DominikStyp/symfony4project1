@@ -23,10 +23,6 @@ class RuntimeExceptionsLogger {
         // setup the Response object based on the caught exception
         $event->setResponse($response);
         $this->logger->error($message, ['stack_trace' => $exception->getTraceAsString()]);
-
-        // you can alternatively set a new Exception
-        // $exception = new \Exception('Some special exception');
-        // $event->setException($exception);
     }
 
 
