@@ -36,6 +36,3 @@ doctrine:
                 JSON_CONTAINS: Scienta\DoctrineJsonFunctions\Query\AST\Functions\Mysql\JsonContains
             numeric_functions:
                 rand: App\DoctrineAdditionalFunctions\Rand
-        result_cache_driver:
-            type: php_file
-            #directory: '%kernel.project_dir%/cache'
