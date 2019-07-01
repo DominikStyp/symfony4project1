@@ -9,13 +9,14 @@ use App\Entity\Post;
 use App\Entity\User;
 use App\Entity\UserAdditionalAttributes;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Faker\Factory;
 use Faker\Generator;
 
-class StaticFixtures extends Fixture {
+class StaticFixtures extends Fixture implements FixtureGroupInterface  {
     private $users;
     /** @var EntityManagerInterface  */
     private $entityManager;
@@ -167,6 +168,16 @@ class StaticFixtures extends Fixture {
             default: return [];
         }
 
+    }
+
+    /**
+     * This method must return an array of groups
+     * on which the implementing class belongs to
+     *
+     * @return string[]
+     */
+    public static function getGroups(): array {
+        return ['static'];
     }
 
 

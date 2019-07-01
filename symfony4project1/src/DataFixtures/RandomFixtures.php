@@ -7,6 +7,7 @@ use App\Entity\Post;
 use App\Entity\User;
 use App\Entity\UserAdditionalAttributes;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
@@ -19,7 +20,7 @@ use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class RandomFixtures extends Fixture {
+class RandomFixtures extends Fixture implements FixtureGroupInterface {
     private $users;
     /** @var EntityManagerInterface  */
     private $entityManager;
@@ -180,4 +181,13 @@ class RandomFixtures extends Fixture {
 
     }
 
+    /**
+     * This method must return an array of groups
+     * on which the implementing class belongs to
+     *
+     * @return string[]
+     */
+    public static function getGroups(): array {
+        return ['random'];
+    }
 }
